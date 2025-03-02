@@ -87,3 +87,40 @@ body {
     background: #999;
     margin: 0 auto;
   }
+  footer {
+    background-color: #222; /* Color de fondo del footer */
+    color: #fff;            /* Color de texto */
+    padding: 20px 0;        /* Espaciado superior e inferior */
+  }
+  
+  .footer-container {
+    max-width: 1200px;      /* Ancho máximo del contenedor */
+    margin: 0 auto;         /* Centrar horizontalmente */
+    display: flex;          /* Para alinear columnas en fila */
+    flex-wrap: wrap;        /* Permitir salto si la pantalla es muy pequeña */
+    justify-content: space-between;
+  }
+  
+  .footer-column {
+    flex: 1;                /* Cada columna toma el mismo espacio disponible */
+    min-width: 200px;       /* Ancho mínimo para columnas */
+    margin: 10px;
+  }
+  
+  .footer-column img {
+    max-width: 80px;        /* Ajustar tamaño máximo del logo */
+    margin-bottom: 10px;
+  }
+  
+  .footer-column p,
+  .footer-column li {
+    font-size: 14px;        /* Tamaño de fuente */
+    margin: 5px 0;
+  }
+  
+  .footer-column ul {
+    list-style: none;       /* Quitar viñetas */
+    padding: 0;
+    margin: 0;
+  }
+  
