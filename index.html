@@ -11,20 +11,18 @@
       font-family: Arial, sans-serif;
       background: #f0f0f0;
     }
-
     .main-container {
       display: flex; /* Para columnas */
       min-height: 100vh;
     }
-
-    /* Panel izquierdo: preguntas/conclusiones */
+    /* Panel izquierdo: “chat” de preguntas y respuestas */
     .left-panel {
       flex: 2;
       background: #fff;
       padding: 20px;
+      overflow-y: auto;
     }
-
-    /* Panel derecho: diagrama de flujo */
+    /* Panel derecho: diagrama / línea de razonamiento */
     .right-panel {
       flex: 1;
       background: #fafafa;
@@ -38,49 +36,45 @@
       margin-top: 0;
     }
 
-    /* Estilos para la sección de preguntas */
-    .question-container {
-      max-width: 600px;
-      margin: 0 auto;
-      text-align: left;
+    /* Contenedor para cada “mensaje” en el “chat” */
+    .message {
+      margin-bottom: 20px;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #ddd;
     }
-
-    .question {
-      margin: 20px 0;
-      font-size: 18px;
+    .question-header {
       font-weight: bold;
+      margin-bottom: 5px;
     }
-
+    .question-text {
+      margin-bottom: 10px;
+    }
     .answers {
-      margin: 10px 0;
+      margin-bottom: 10px;
     }
-
     label {
       margin-right: 20px;
     }
+    .conclusion {
+      background: #e0ffe0;
+      border: 1px solid #00cc00;
+    }
 
-    #nextBtn {
-      padding: 10px 20px;
-      font-size: 16px;
+    button {
+      padding: 8px 16px;
+      font-size: 14px;
       cursor: pointer;
       background: #007bff;
       color: #fff;
       border: none;
       border-radius: 4px;
     }
-    #nextBtn:hover {
+    button:hover {
       background: #0056b3;
     }
 
-    #result {
-      margin-top: 30px;
-      padding: 15px;
-      background: #e0ffe0;
-      border: 1px solid #00cc00;
-      border-radius: 5px;
-    }
-
-    /* Estilos para el “diagrama de flujo” simplificado */
+    /* Estilos para el diagrama de inferencia (derecha) */
     .flow-node {
       padding: 10px;
       margin: 10px 0;
@@ -89,19 +83,15 @@
       background: #fff;
       position: relative;
     }
-
     .flow-node h3 {
       margin: 0 0 5px 0;
       font-size: 16px;
       font-weight: bold;
     }
-
     .flow-node p {
       margin: 0;
       font-size: 14px;
     }
-
-    /* Flecha entre nodos (opcional, simple) */
     .flow-arrow {
       width: 2px;
       height: 20px;
@@ -112,11 +102,11 @@
 </head>
 <body>
   <div class="main-container">
-    <!-- Panel Izquierdo: Preguntas / Conclusiones -->
+    <!-- Panel Izquierdo: “Chat” de preguntas y conclusiones -->
     <div class="left-panel">
       <h1>Diagnóstico de la Impresora</h1>
-      <div class="question-container" id="questionContainer">
-        <!-- Aquí se inyectarán las preguntas y conclusiones dinámicamente -->
+      <div id="chatContainer">
+        <!-- Aquí se irán añadiendo las preguntas y conclusiones de forma acumulativa -->
       </div>
     </div>
 
@@ -133,7 +123,6 @@
     /***********************************************************************
      * 1. DEFINICIÓN DE NODOS (REGLAS Y CONCLUSIONES)
      ***********************************************************************/
-
     /*
       Cada nodo (objeto) tiene:
       - id: identificador único
@@ -300,28 +289,23 @@
      * 2. GESTIÓN DE ESTADO
      ***********************************************************************/
     let currentNodeId = "start";
-
     // Este array guardará el camino recorrido: { nodeId, type, text, answer }
-    // "answer" será la respuesta que llevó a este nodo ("yes", "no" o "start").
     const inferencePath = [];
 
     // Referencias al DOM
-    const questionContainer = document.getElementById("questionContainer");
+    const chatContainer = document.getElementById("chatContainer");
     const diagramContainer = document.getElementById("diagramContainer");
 
     /***********************************************************************
      * 3. FUNCIONES PARA RENDERIZAR NODOS Y DIAGRAMA
      ***********************************************************************/
 
-    // Cargar un nodo (pregunta o conclusión) en el panel izquierdo
-    function loadNode(nodeId, answer = "start") {
-      currentNodeId = nodeId;
+    // Muestra un nodo (pregunta o conclusión) en el “chat” (panel izquierdo)
+    // sin eliminar las preguntas anteriores.
+    function showNode(nodeId, answer = "start") {
       const node = nodes[nodeId];
 
-      // Limpia el contenedor de la pregunta/conclusión actual
-      questionContainer.innerHTML = "";
-
-      // 1) Agregamos este nodo al camino de inferencia
+      // Agregamos este nodo al camino de inferencia
       inferencePath.push({
         nodeId: node.id,
         type: node.type,
@@ -329,67 +313,78 @@
         answer: answer
       });
 
-      // 2) Actualizamos el diagrama a la derecha
+      // Actualizamos el diagrama a la derecha
       updateDiagram();
 
-      // 3) Renderizamos la pregunta o la conclusión en el panel izquierdo
+      // Creamos un contenedor para este “mensaje”
+      const messageEl = document.createElement("div");
+      messageEl.classList.add("message");
+
+      // Diferenciamos pregunta vs conclusión
       if (node.type === "question") {
-        // Crear el elemento de pregunta
-        const questionEl = document.createElement("div");
-        questionEl.classList.add("question");
-        questionEl.textContent = node.text;
-        questionContainer.appendChild(questionEl);
-
-        // Crear las opciones de respuesta
-        const answersEl = document.createElement("div");
-        answersEl.classList.add("answers");
-        answersEl.innerHTML = `
-          <label>
-            <input type="radio" name="answer" value="yes" /> Sí
-          </label>
-          <label>
-            <input type="radio" name="answer" value="no" /> No
-          </label>
+        // Pregunta
+        messageEl.innerHTML = `
+          <div class="question-header">Pregunta [${node.id}]</div>
+          <div class="question-text">${node.text}</div>
+          <div class="answers">
+            <label>
+              <input type="radio" name="answer-${node.id}" value="yes" /> Sí
+            </label>
+            <label>
+              <input type="radio" name="answer-${node.id}" value="no" /> No
+            </label>
+          </div>
+          <button id="btn-${node.id}">Siguiente</button>
         `;
-        questionContainer.appendChild(answersEl);
+        chatContainer.appendChild(messageEl);
 
-        // Botón para continuar
-        const nextBtn = document.createElement("button");
-        nextBtn.id = "nextBtn";
-        nextBtn.textContent = "Siguiente";
-        nextBtn.addEventListener("click", () => {
-          const selected = document.querySelector('input[name="answer"]:checked');
+        // Listener para el botón
+        const btnNext = document.getElementById(`btn-${node.id}`);
+        btnNext.addEventListener("click", () => {
+          const selected = document.querySelector(`input[name="answer-${node.id}"]:checked`);
           if (!selected) {
             alert("Por favor, selecciona Sí o No.");
             return;
           }
           const userAnswer = selected.value; // "yes" o "no"
+
+          // Deshabilitar las opciones para no volver a contestar
+          btnNext.disabled = true;
+          const radios = messageEl.querySelectorAll(`input[name="answer-${node.id}"]`);
+          radios.forEach(r => r.disabled = true);
+
+          // Ir al siguiente nodo
           goToNextNode(node, userAnswer);
         });
-        questionContainer.appendChild(nextBtn);
 
-      } else if (node.type === "conclusion") {
-        // Mostrar la conclusión
-        const conclusionEl = document.createElement("div");
-        conclusionEl.id = "result";
-        conclusionEl.innerHTML = `<h2>Conclusión:</h2><p>${node.text}</p>`;
-        questionContainer.appendChild(conclusionEl);
+      } else {
+        // Conclusión
+        messageEl.classList.add("conclusion");
+        messageEl.innerHTML = `
+          <div class="question-header">Conclusión [${node.id}]</div>
+          <div class="question-text">${node.text}</div>
+        `;
+        chatContainer.appendChild(messageEl);
       }
+
+      // Hacer scroll automático al final del panel
+      chatContainer.scrollTop = chatContainer.scrollHeight;
     }
 
-    // Decidir el siguiente nodo según la respuesta
+    // Determina el siguiente nodo según la respuesta y lo muestra
     function goToNextNode(node, answer) {
-      // Obtenemos el id del siguiente nodo (según "yes" o "no")
       const nextId = (answer === "yes") ? node.yes : node.no;
       if (nextId) {
-        loadNode(nextId, answer);
+        showNode(nextId, answer);
       } else {
-        // Si no hay un nodo definido, mostramos un mensaje de error (caso raro)
-        questionContainer.innerHTML = "<p>No se encontró el siguiente paso en la red de inferencia.</p>";
+        // Caso raro: no hay nodo siguiente
+        const msg = document.createElement("div");
+        msg.innerHTML = "<p>No se encontró el siguiente paso en la red de inferencia.</p>";
+        chatContainer.appendChild(msg);
       }
     }
 
-    // Renderizar la “línea de razonamiento” en el panel derecho
+    // Actualiza la “línea de razonamiento” (panel derecho)
     function updateDiagram() {
       diagramContainer.innerHTML = "";
 
@@ -399,9 +394,6 @@
         stepEl.classList.add("flow-node");
 
         // Color según la respuesta que llevó a este nodo
-        // - "start": nodo inicial (sin color especial)
-        // - "yes": verde
-        // - "no": rojo
         if (step.answer === "yes") {
           stepEl.style.borderColor = "green";
         } else if (step.answer === "no") {
@@ -421,10 +413,9 @@
           `;
         }
 
-        // Agregamos el nodo al diagrama
         diagramContainer.appendChild(stepEl);
 
-        // Si no es el último nodo, dibujamos una flecha (simple)
+        // Flecha entre nodos (salvo el último)
         if (index < inferencePath.length - 1) {
           const arrowEl = document.createElement("div");
           arrowEl.classList.add("flow-arrow");
@@ -437,7 +428,7 @@
      * 4. INICIALIZACIÓN
      ***********************************************************************/
     // Cargar el nodo inicial
-    loadNode(currentNodeId);
+    showNode(currentNodeId);
   </script>
 </body>
 </html>
