@@ -1,10 +1,9 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Diagnóstico Impresora HP DeskJet 2723</title>
+  <meta charset="UTF-8" />
+  <title>Sistema de Diagnóstico - Impresora HP DeskJet 2723</title>
   <style>
-    /* CSS para estilos básicos */
     body {
       font-family: Arial, sans-serif;
       background: #f0f0f0;
@@ -12,7 +11,7 @@
       padding: 20px;
     }
     .container {
-      max-width: 800px;
+      max-width: 600px;
       margin: auto;
       background: #fff;
       padding: 20px;
@@ -22,337 +21,307 @@
     h1, h2 {
       text-align: center;
     }
-    .section {
-      margin-bottom: 30px;
-      padding-bottom: 10px;
-      border-bottom: 1px solid #ccc;
-    }
     .question {
-      margin: 15px 0;
+      margin: 20px 0;
+      font-size: 18px;
+      font-weight: bold;
     }
-    .question p {
-      margin: 0 0 5px 0;
+    .answers {
+      margin: 10px 0;
     }
-    .question label {
-      margin-right: 10px;
+    label {
+      margin-right: 20px;
+    }
+    #nextBtn {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      background: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+    }
+    #nextBtn:hover {
+      background: #0056b3;
     }
     #result {
-      margin-top: 20px;
+      margin-top: 30px;
       padding: 15px;
       background: #e0ffe0;
       border: 1px solid #00cc00;
       border-radius: 5px;
     }
-    .btn {
-      display: block;
-      width: 100%;
-      padding: 10px;
-      font-size: 16px;
-      margin-top: 20px;
-      background: #007bff;
-      color: #fff;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    .btn:hover {
-      background: #0056b3;
-    }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Diagnóstico Impresora HP DeskJet 2723</h1>
-    <form id="diagnosticForm">
-      <!-- Sección 1: Conectividad Inalámbrica -->
-      <div class="section">
-        <h2>1. Conectividad Inalámbrica</h2>
-        <div class="question">
-          <p><strong>Regla 1:</strong> ¿La luz de conexión inalámbrica está apagada?</p>
-          <label><input type="radio" name="q1" value="yes" required> Sí</label>
-          <label><input type="radio" name="q1" value="no"> No</label>
-        </div>
-        <div class="question">
-          <p><strong>Regla 2:</strong> ¿La luz de conexión inalámbrica parpadea en azul?</p>
-          <label><input type="radio" name="q2" value="yes" required> Sí</label>
-          <label><input type="radio" name="q2" value="no"> No</label>
-        </div>
-        <div class="question">
-          <p><strong>Regla 3:</strong> ¿El ordenador está conectado a una VPN?</p>
-          <label><input type="radio" name="q3" value="yes" required> Sí</label>
-          <label><input type="radio" name="q3" value="no"> No</label>
-        </div>
-        <div class="question">
-          <p><strong>Regla 4:</strong> ¿El ordenador está conectado por cable Ethernet?</p>
-          <label><input type="radio" name="q4" value="yes" required> Sí</label>
-          <label><input type="radio" name="q4" value="no"> No</label>
-        </div>
-        <div class="question">
-          <p><strong>Regla 4 (continuación):</strong> ¿La impresora se detecta en el ordenador?</p>
-          <label><input type="radio" name="q5" value="yes" required> Sí</label>
-          <label><input type="radio" name="q5" value="no"> No</label>
-        </div>
-        <div class="question">
-          <p><strong>Regla 5:</strong> ¿El dispositivo móvil detecta la impresora?</p>
-          <label><input type="radio" name="q6" value="yes" required> Sí</label>
-          <label><input type="radio" name="q6" value="no"> No</label>
-        </div>
-      </div>
-
-      <!-- Sección 2: Problemas de Impresión -->
-      <div class="section">
-        <h2>2. Problemas de Impresión</h2>
-        <div class="question">
-          <p><strong>Regla 6:</strong> ¿Está encendido el indicador luminoso de tinta?</p>
-          <label><input type="radio" name="q7" value="yes" required> Sí</label>
-          <label><input type="radio" name="q7" value="no"> No</label>
-        </div>
-        <div class="question">
-          <p><strong>Regla 7:</strong> ¿La impresión sale borrosa o con rayas?</p>
-          <label><input type="radio" name="q8" value="yes" required> Sí</label>
-          <label><input type="radio" name="q8" value="no"> No</label>
-        </div>
-        <div class="question">
-          <p><strong>Regla 8:</strong> ¿No se imprime nada?</p>
-          <label><input type="radio" name="q9" value="yes" required> Sí</label>
-          <label><input type="radio" name="q9" value="no"> No</label>
-        </div>
-        <div class="question">
-          <p><strong>Regla 9:</strong> ¿La calidad de impresión es mala?</p>
-          <label><input type="radio" name="q10" value="yes" required> Sí</label>
-          <label><input type="radio" name="q10" value="no"> No</label>
-        </div>
-        <div class="question">
-          <p><strong>Regla 10:</strong> ¿La impresora no imprime en color?</p>
-          <label><input type="radio" name="q11" value="yes" required> Sí</label>
-          <label><input type="radio" name="q11" value="no"> No</label>
-        </div>
-      </div>
-
-      <!-- Sección 3: Problemas con el Papel -->
-      <div class="section">
-        <h2>3. Problemas con el Papel</h2>
-        <div class="question">
-          <p><strong>Regla 11:</strong> ¿Hay un atasco de papel?</p>
-          <label><input type="radio" name="q12" value="yes" required> Sí</label>
-          <label><input type="radio" name="q12" value="no"> No</label>
-        </div>
-        <div class="question">
-          <p><strong>Regla 12:</strong> ¿La impresora indica que no hay papel a pesar de tener papel en la bandeja?</p>
-          <label><input type="radio" name="q13" value="yes" required> Sí</label>
-          <label><input type="radio" name="q13" value="no"> No</label>
-        </div>
-        <div class="question">
-          <p><strong>Regla 13:</strong> ¿La impresora toma varias hojas al mismo tiempo?</p>
-          <label><input type="radio" name="q14" value="yes" required> Sí</label>
-          <label><input type="radio" name="q14" value="no"> No</label>
-        </div>
-        <div class="question">
-          <p><strong>Regla 14:</strong> ¿El papel se arruga al imprimir?</p>
-          <label><input type="radio" name="q15" value="yes" required> Sí</label>
-          <label><input type="radio" name="q15" value="no"> No</label>
-        </div>
-        <div class="question">
-          <p><strong>Regla 15:</strong> ¿La impresora imprime páginas en blanco?</p>
-          <label><input type="radio" name="q16" value="yes" required> Sí</label>
-          <label><input type="radio" name="q16" value="no"> No</label>
-        </div>
-      </div>
-
-      <!-- Sección 4: Diagnóstico de Configuración -->
-      <div class="section">
-        <h2>4. Diagnóstico de Configuración</h2>
-        <div class="question">
-          <p><strong>Regla 16:</strong> ¿La impresora no responde?</p>
-          <label><input type="radio" name="q17" value="yes" required> Sí</label>
-          <label><input type="radio" name="q17" value="no"> No</label>
-        </div>
-        <div class="question">
-          <p><strong>Regla 17:</strong> ¿El botón de reanudar está parpadeando?</p>
-          <label><input type="radio" name="q18" value="yes" required> Sí</label>
-          <label><input type="radio" name="q18" value="no"> No</label>
-        </div>
-        <div class="question">
-          <p><strong>Regla 18:</strong> ¿La impresora muestra un código de error?</p>
-          <label><input type="radio" name="q19" value="yes" required> Sí</label>
-          <label><input type="radio" name="q19" value="no"> No</label>
-        </div>
-        <div class="question">
-          <p><strong>Regla 19:</strong> ¿La impresora no es reconocida por la computadora?</p>
-          <label><input type="radio" name="q20" value="yes" required> Sí</label>
-          <label><input type="radio" name="q20" value="no"> No</label>
-        </div>
-        <div class="question">
-          <p><strong>Regla 20:</strong> ¿La impresora aparece en la red?</p>
-          <label><input type="radio" name="q21" value="yes" required> Sí</label>
-          <label><input type="radio" name="q21" value="no"> No</label>
-        </div>
-      </div>
-
-      <!-- Sección 5: Diagnóstico de Botones e Indicadores -->
-      <div class="section">
-        <h2>5. Botones e Indicadores</h2>
-        <div class="question">
-          <p><strong>Regla 21:</strong> ¿El botón de encendido responde?</p>
-          <label><input type="radio" name="q22" value="yes" required> Sí</label>
-          <label><input type="radio" name="q22" value="no"> No</label>
-        </div>
-        <div class="question">
-          <p><strong>Regla 22:</strong> ¿El botón de cancelar funciona?</p>
-          <label><input type="radio" name="q23" value="yes" required> Sí</label>
-          <label><input type="radio" name="q23" value="no"> No</label>
-        </div>
-        <div class="question">
-          <p><strong>Regla 23:</strong> ¿La luz de información está encendida?</p>
-          <label><input type="radio" name="q24" value="yes" required> Sí</label>
-          <label><input type="radio" name="q24" value="no"> No</label>
-        </div>
-        <div class="question">
-          <p><strong>Regla 24:</strong> ¿El botón de copia en color funciona?</p>
-          <label><input type="radio" name="q25" value="yes" required> Sí</label>
-          <label><input type="radio" name="q25" value="no"> No</label>
-        </div>
-        <div class="question">
-          <p><strong>Regla 25:</strong> ¿La luz de Wi‑Fi Direct está encendida?</p>
-          <label><input type="radio" name="q26" value="yes" required> Sí</label>
-          <label><input type="radio" name="q26" value="no"> No</label>
-        </div>
-      </div>
-
-      <button type="submit" class="btn">Diagnosticar</button>
-    </form>
+    <h1>Diagnóstico de la Impresora</h1>
+    <div id="questionContainer">
+      <!-- Aquí se inyectarán las preguntas y conclusiones dinámicamente -->
+    </div>
     <div id="result"></div>
   </div>
 
   <script>
-    // Al enviar el formulario se evalúan las respuestas y se muestran las soluciones
-    document.getElementById("diagnosticForm").addEventListener("submit", function(e) {
-      e.preventDefault();
-      // Se obtienen las respuestas de cada pregunta
-      const answers = {
-        q1: document.querySelector('input[name="q1"]:checked').value,
-        q2: document.querySelector('input[name="q2"]:checked').value,
-        q3: document.querySelector('input[name="q3"]:checked').value,
-        q4: document.querySelector('input[name="q4"]:checked').value,
-        q5: document.querySelector('input[name="q5"]:checked').value,
-        q6: document.querySelector('input[name="q6"]:checked').value,
-        q7: document.querySelector('input[name="q7"]:checked').value,
-        q8: document.querySelector('input[name="q8"]:checked').value,
-        q9: document.querySelector('input[name="q9"]:checked').value,
-        q10: document.querySelector('input[name="q10"]:checked').value,
-        q11: document.querySelector('input[name="q11"]:checked').value,
-        q12: document.querySelector('input[name="q12"]:checked').value,
-        q13: document.querySelector('input[name="q13"]:checked').value,
-        q14: document.querySelector('input[name="q14"]:checked').value,
-        q15: document.querySelector('input[name="q15"]:checked').value,
-        q16: document.querySelector('input[name="q16"]:checked').value,
-        q17: document.querySelector('input[name="q17"]:checked').value,
-        q18: document.querySelector('input[name="q18"]:checked').value,
-        q19: document.querySelector('input[name="q19"]:checked').value,
-        q20: document.querySelector('input[name="q20"]:checked').value,
-        q21: document.querySelector('input[name="q21"]:checked').value,
-        q22: document.querySelector('input[name="q22"]:checked').value,
-        q23: document.querySelector('input[name="q23"]:checked').value,
-        q24: document.querySelector('input[name="q24"]:checked').value,
-        q25: document.querySelector('input[name="q25"]:checked').value,
-        q26: document.querySelector('input[name="q26"]:checked').value
-      };
+    /***********************************************************************
+     * 1. DEFINICIÓN DE NODOS (REGLAS Y CONCLUSIONES)
+     ***********************************************************************/
 
-      let solutions = [];
+    /*
+      Cada nodo tiene:
+      - id: identificador único
+      - type: "question" o "conclusion"
+      - text: texto a mostrar (pregunta o conclusión)
+      - yes: (opcional) id del siguiente nodo si la respuesta es "Sí"
+      - no:  (opcional) id del siguiente nodo si la respuesta es "No"
 
-      // Sección 1: Conectividad Inalámbrica
-      if (answers.q1 === "yes") {
-        solutions.push("Regla 1: Reiniciar el modo de configuración inalámbrica.");
-      }
-      if (answers.q2 === "yes") {
-        solutions.push("Regla 2: Utilizar la aplicación HP Smart para completar la conexión.");
-      }
-      if (answers.q3 === "yes") {
-        solutions.push("Regla 3: Desconectar de la VPN antes de la instalación y reconectar después.");
-      }
-      if (answers.q4 === "yes" && answers.q5 === "no") {
-        solutions.push("Regla 4: Habilitar la conexión Wi‑Fi en el ordenador.");
-      }
-      if (answers.q6 === "no") {
-        solutions.push("Regla 5: Activar Bluetooth y localización en el dispositivo móvil.");
-      }
+      En este ejemplo, se ha construido un "camino" simplificado para ilustrar
+      cómo encadenar preguntas y llegar a conclusiones.
+    */
 
-      // Sección 2: Problemas de Impresión
-      if (answers.q7 === "yes") {
-        solutions.push("Regla 6: Revisar y reemplazar el cartucho si es necesario.");
-      }
-      if (answers.q8 === "yes") {
-        solutions.push("Regla 7: Realizar una limpieza del cabezal de impresión desde el software HP Smart.");
-      }
-      if (answers.q9 === "yes") {
-        solutions.push("Regla 8: Revisar la instalación del cartucho y reinstalarlo correctamente.");
-      }
-      if (answers.q10 === "yes") {
-        solutions.push("Regla 9: Usar papel de buena calidad y almacenarlo en un lugar seco.");
-      }
-      if (answers.q11 === "yes") {
-        solutions.push("Regla 10: Revisar y reemplazar el cartucho de color si es necesario.");
-      }
+    const nodes = {
+      // Nodo inicial
+      start: {
+        id: "start",
+        type: "question",
+        text: "¿La impresora enciende correctamente?",
+        yes: "q1",
+        no: "c0"
+      },
 
-      // Sección 3: Problemas con el Papel
-      if (answers.q12 === "yes") {
-        solutions.push("Regla 11: Retirar el papel atascado con cuidado y reiniciar la impresora.");
-      }
-      if (answers.q13 === "yes") {
-        solutions.push("Regla 12: Limpiar el sensor de papel con un paño seco.");
-      }
-      if (answers.q14 === "yes") {
-        solutions.push("Regla 13: Asegurar que la cantidad de papel sea adecuada y que las hojas estén bien alineadas.");
-      }
-      if (answers.q15 === "yes") {
-        solutions.push("Regla 14: Usar papel seco y sin dobleces.");
-      }
-      if (answers.q16 === "yes") {
-        solutions.push("Regla 15: Revisar y reemplazar los cartuchos si es necesario.");
-      }
+      // Conclusión si la impresora no enciende
+      c0: {
+        id: "c0",
+        type: "conclusion",
+        text: "Posible problema de alimentación. Verifique cable de alimentación, enchufe y botón de encendido."
+      },
 
-      // Sección 4: Diagnóstico de Configuración
-      if (answers.q17 === "yes") {
-        solutions.push("Regla 16: Apagar la impresora, esperar 10 segundos y encenderla de nuevo.");
-      }
-      if (answers.q18 === "yes") {
-        solutions.push("Regla 17: Presionar el botón de reanudar o cancelar el trabajo desde la computadora.");
-      }
-      if (answers.q19 === "yes") {
-        solutions.push("Regla 18: Consultar la guía de usuario en línea para identificar el código de error.");
-      }
-      if (answers.q20 === "yes") {
-        solutions.push("Regla 19: Actualizar los controladores desde la página oficial de HP.");
-      }
-      if (answers.q21 === "no") {
-        solutions.push("Regla 20: Revisar la configuración del router y permitir la conexión de la impresora.");
-      }
+      // Pregunta 1
+      q1: {
+        id: "q1",
+        type: "question",
+        text: "¿La luz Wi-Fi está encendida (fija o parpadeando)?",
+        yes: "q2",
+        no: "c1"
+      },
 
-      // Sección 5: Botones e Indicadores
-      if (answers.q22 === "no") {
-        solutions.push("Regla 21: Revisar el cable de alimentación y probar en otro enchufe.");
-      }
-      if (answers.q23 === "no") {
-        solutions.push("Regla 22: Reiniciar la impresora.");
-      }
-      if (answers.q24 === "yes") {
-        solutions.push("Regla 23: Consultar el estado de la impresora en el software HP Smart.");
-      }
-      if (answers.q25 === "no") {
-        solutions.push("Regla 24: Revisar el cartucho de color y reemplazarlo si es necesario.");
-      }
-      if (answers.q26 === "no") {
-        solutions.push("Regla 25: Activar Wi‑Fi Direct desde el panel de control de la impresora.");
-      }
+      // Conclusión: Luz Wi-Fi apagada
+      c1: {
+        id: "c1",
+        type: "conclusion",
+        text: "La impresora no está conectada a Wi-Fi. Solución: Reiniciar el modo de configuración inalámbrica."
+      },
 
-      // Mostrar resultados
-      const resultDiv = document.getElementById("result");
-      if (solutions.length > 0) {
-        resultDiv.innerHTML = "<h2>Posibles Soluciones:</h2><ul>" + solutions.map(sol => "<li>" + sol + "</li>").join("") + "</ul>";
+      // Pregunta 2
+      q2: {
+        id: "q2",
+        type: "question",
+        text: "¿La luz Wi-Fi parpadea en azul?",
+        yes: "c2",
+        no: "q3"
+      },
+
+      // Conclusión: Modo configuración Wi-Fi
+      c2: {
+        id: "c2",
+        type: "conclusion",
+        text: "La impresora está en modo de configuración Wi-Fi. Use la app HP Smart para finalizar la conexión."
+      },
+
+      // Pregunta 3
+      q3: {
+        id: "q3",
+        type: "question",
+        text: "¿El indicador luminoso de tinta está encendido?",
+        yes: "c3",
+        no: "q4"
+      },
+
+      // Conclusión: Problema de tinta
+      c3: {
+        id: "c3",
+        type: "conclusion",
+        text: "El nivel de tinta es bajo o hay un problema con el cartucho. Solución: Revisar o reemplazar el cartucho."
+      },
+
+      // Pregunta 4
+      q4: {
+        id: "q4",
+        type: "question",
+        text: "¿La impresión sale borrosa o con rayas?",
+        yes: "c4",
+        no: "q5"
+      },
+
+      // Conclusión: Limpieza de cabezal
+      c4: {
+        id: "c4",
+        type: "conclusion",
+        text: "Los inyectores del cartucho pueden estar obstruidos. Solución: Realizar limpieza del cabezal de impresión."
+      },
+
+      // Pregunta 5
+      q5: {
+        id: "q5",
+        type: "question",
+        text: "¿Hay un atasco de papel?",
+        yes: "c5",
+        no: "q6"
+      },
+
+      // Conclusión: Atasco de papel
+      c5: {
+        id: "c5",
+        type: "conclusion",
+        text: "Retire el papel atascado con cuidado y reinicie la impresora."
+      },
+
+      // Pregunta 6
+      q6: {
+        id: "q6",
+        type: "question",
+        text: "¿La impresora no responde a ningún comando?",
+        yes: "c6",
+        no: "q7"
+      },
+
+      // Conclusión: Reinicio general
+      c6: {
+        id: "c6",
+        type: "conclusion",
+        text: "La impresora podría necesitar un reinicio. Apáguela, espere 10 segundos y enciéndala de nuevo."
+      },
+
+      // Pregunta 7
+      q7: {
+        id: "q7",
+        type: "question",
+        text: "¿La calidad de impresión es mala (hojas en blanco o tinta irregular)?",
+        yes: "q8",
+        no: "c9"
+      },
+
+      // Pregunta 8
+      q8: {
+        id: "q8",
+        type: "question",
+        text: "¿El cartucho de color o negro está vacío?",
+        yes: "c7",
+        no: "c8"
+      },
+
+      // Conclusión: Reemplazar cartuchos
+      c7: {
+        id: "c7",
+        type: "conclusion",
+        text: "Reemplace el cartucho vacío o dañado y pruebe nuevamente."
+      },
+
+      // Conclusión: Revisar instalación cartuchos
+      c8: {
+        id: "c8",
+        type: "conclusion",
+        text: "Verifique que los cartuchos estén bien instalados y que el papel sea de buena calidad."
+      },
+
+      // Conclusión final si no se detectan problemas
+      c9: {
+        id: "c9",
+        type: "conclusion",
+        text: "No se detecta un problema específico según las respuestas. Consulte la guía de usuario o soporte de HP."
+      }
+    };
+
+
+    /***********************************************************************
+     * 2. LÓGICA DE NAVEGACIÓN (RED DE INFERENCIA)
+     ***********************************************************************/
+
+    // Estado actual
+    let currentNodeId = "start";
+
+    // Referencias al DOM
+    const questionContainer = document.getElementById("questionContainer");
+    const resultDiv = document.getElementById("result");
+
+    // Función para renderizar el nodo actual (pregunta o conclusión)
+    function loadNode(nodeId) {
+      currentNodeId = nodeId;
+      const node = nodes[nodeId];
+
+      // Limpiar contenedor
+      questionContainer.innerHTML = "";
+      resultDiv.innerHTML = "";
+
+      if (node.type === "question") {
+        // Mostrar pregunta y opciones Sí/No
+        const questionEl = document.createElement("div");
+        questionEl.classList.add("question");
+        questionEl.textContent = node.text;
+        questionContainer.appendChild(questionEl);
+
+        // Contenedor para radio buttons
+        const answersEl = document.createElement("div");
+        answersEl.classList.add("answers");
+        answersEl.innerHTML = `
+          <label>
+            <input type="radio" name="answer" value="yes" /> Sí
+          </label>
+          <label>
+            <input type="radio" name="answer" value="no" /> No
+          </label>
+        `;
+        questionContainer.appendChild(answersEl);
+
+        // Botón para continuar
+        const nextBtn = document.createElement("button");
+        nextBtn.id = "nextBtn";
+        nextBtn.textContent = "Siguiente";
+        nextBtn.addEventListener("click", () => {
+          const selected = document.querySelector('input[name="answer"]:checked');
+          if (!selected) {
+            alert("Por favor, selecciona Sí o No.");
+            return;
+          }
+          const answer = selected.value; // "yes" o "no"
+          goToNextNode(node, answer);
+        });
+        questionContainer.appendChild(nextBtn);
+
+      } else if (node.type === "conclusion") {
+        // Mostrar la conclusión
+        const conclusionEl = document.createElement("div");
+        conclusionEl.id = "result";
+        conclusionEl.innerHTML = `<h2>Conclusión:</h2><p>${node.text}</p>`;
+        questionContainer.appendChild(conclusionEl);
+      }
+    }
+
+    // Función para decidir el siguiente nodo
+    function goToNextNode(node, answer) {
+      if (answer === "yes") {
+        // Puede ser un nodo pregunta o conclusión
+        const nextId = node.yes;
+        if (nextId) {
+          loadNode(nextId);
+        } else {
+          // No hay siguiente nodo definido para "yes"
+          questionContainer.innerHTML = "<p>No se encontró el siguiente paso (YES).</p>";
+        }
       } else {
-        resultDiv.innerHTML = "<h2>No se detectaron problemas según las respuestas proporcionadas.</h2>";
+        // Respuesta "no"
+        const nextId = node.no;
+        if (nextId) {
+          loadNode(nextId);
+        } else {
+          // No hay siguiente nodo definido para "no"
+          questionContainer.innerHTML = "<p>No se encontró el siguiente paso (NO).</p>";
+        }
       }
-    });
+    }
+
+    // Cargar el nodo inicial
+    loadNode(currentNodeId);
   </script>
 </body>
 </html>
