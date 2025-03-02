@@ -1,0 +1,89 @@
+/* Layout de dos columnas */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background: #f0f0f0;
+  }
+  .main-container {
+    display: flex;
+    min-height: 100vh;
+  }
+  /* Panel izquierdo: Chat acumulativo */
+  .left-panel {
+    flex: 2;
+    background: #fff;
+    padding: 20px;
+    overflow-y: auto;
+  }
+  /* Panel derecho: Diagrama de inferencia */
+  .right-panel {
+    flex: 1;
+    background: #fafafa;
+    border-left: 1px solid #ccc;
+    padding: 20px;
+    overflow-y: auto;
+  }
+  h1, h2 {
+    text-align: center;
+    margin-top: 0;
+  }
+  /* Estilos para cada mensaje en el chat */
+  .message {
+    margin-bottom: 20px;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+  }
+  .question-header {
+    font-weight: bold;
+    margin-bottom: 5px;
+  }
+  .question-text {
+    margin-bottom: 10px;
+  }
+  .answers {
+    margin-bottom: 10px;
+  }
+  label {
+    margin-right: 20px;
+  }
+  .conclusion {
+    background: #e0ffe0;
+    border: 1px solid #00cc00;
+  }
+  button {
+    padding: 8px 16px;
+    font-size: 14px;
+    cursor: pointer;
+    background: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+  }
+  button:hover {
+    background: #0056b3;
+  }
+  /* Estilos para el diagrama (panel derecho) */
+  .flow-node {
+    padding: 10px;
+    margin: 10px 0;
+    border: 2px solid #ccc;
+    border-radius: 4px;
+    background: #fff;
+  }
+  .flow-node h3 {
+    margin: 0 0 5px 0;
+    font-size: 16px;
+    font-weight: bold;
+  }
+  .flow-node p {
+    margin: 0;
+    font-size: 14px;
+  }
+  .flow-arrow {
+    width: 2px;
+    height: 20px;
+    background: #999;
+    margin: 0 auto;
+  }
