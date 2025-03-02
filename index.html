@@ -4,34 +4,61 @@
   <meta charset="UTF-8" />
   <title>Sistema de Diagnóstico - Impresora HP DeskJet 2723</title>
   <style>
+    /* Layout de dos columnas */
     body {
+      margin: 0;
+      padding: 0;
       font-family: Arial, sans-serif;
       background: #f0f0f0;
-      margin: 0;
-      padding: 20px;
     }
-    .container {
-      max-width: 600px;
-      margin: auto;
+
+    .main-container {
+      display: flex; /* Para columnas */
+      min-height: 100vh;
+    }
+
+    /* Panel izquierdo: preguntas/conclusiones */
+    .left-panel {
+      flex: 2;
       background: #fff;
       padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
+
+    /* Panel derecho: diagrama de flujo */
+    .right-panel {
+      flex: 1;
+      background: #fafafa;
+      border-left: 1px solid #ccc;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
     h1, h2 {
       text-align: center;
+      margin-top: 0;
     }
+
+    /* Estilos para la sección de preguntas */
+    .question-container {
+      max-width: 600px;
+      margin: 0 auto;
+      text-align: left;
+    }
+
     .question {
       margin: 20px 0;
       font-size: 18px;
       font-weight: bold;
     }
+
     .answers {
       margin: 10px 0;
     }
+
     label {
       margin-right: 20px;
     }
+
     #nextBtn {
       padding: 10px 20px;
       font-size: 16px;
@@ -44,6 +71,7 @@
     #nextBtn:hover {
       background: #0056b3;
     }
+
     #result {
       margin-top: 30px;
       padding: 15px;
@@ -51,15 +79,54 @@
       border: 1px solid #00cc00;
       border-radius: 5px;
     }
+
+    /* Estilos para el “diagrama de flujo” simplificado */
+    .flow-node {
+      padding: 10px;
+      margin: 10px 0;
+      border: 2px solid #ccc;
+      border-radius: 4px;
+      background: #fff;
+      position: relative;
+    }
+
+    .flow-node h3 {
+      margin: 0 0 5px 0;
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    .flow-node p {
+      margin: 0;
+      font-size: 14px;
+    }
+
+    /* Flecha entre nodos (opcional, simple) */
+    .flow-arrow {
+      width: 2px;
+      height: 20px;
+      background: #999;
+      margin: 0 auto;
+    }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Diagnóstico de la Impresora</h1>
-    <div id="questionContainer">
-      <!-- Aquí se inyectarán las preguntas y conclusiones dinámicamente -->
+  <div class="main-container">
+    <!-- Panel Izquierdo: Preguntas / Conclusiones -->
+    <div class="left-panel">
+      <h1>Diagnóstico de la Impresora</h1>
+      <div class="question-container" id="questionContainer">
+        <!-- Aquí se inyectarán las preguntas y conclusiones dinámicamente -->
+      </div>
     </div>
-    <div id="result"></div>
+
+    <!-- Panel Derecho: Visualización de la red de inferencia (en tiempo real) -->
+    <div class="right-panel">
+      <h2>Línea de Razonamiento</h2>
+      <div id="diagramContainer">
+        <!-- Se mostrará el “camino” recorrido en la red de inferencia -->
+      </div>
+    </div>
   </div>
 
   <script>
@@ -68,15 +135,12 @@
      ***********************************************************************/
 
     /*
-      Cada nodo tiene:
+      Cada nodo (objeto) tiene:
       - id: identificador único
       - type: "question" o "conclusion"
-      - text: texto a mostrar (pregunta o conclusión)
-      - yes: (opcional) id del siguiente nodo si la respuesta es "Sí"
-      - no:  (opcional) id del siguiente nodo si la respuesta es "No"
-
-      En este ejemplo, se ha construido un "camino" simplificado para ilustrar
-      cómo encadenar preguntas y llegar a conclusiones.
+      - text: texto a mostrar
+      - yes: id del siguiente nodo si la respuesta es "Sí"
+      - no:  id del siguiente nodo si la respuesta es "No"
     */
 
     const nodes = {
@@ -109,7 +173,7 @@
       c1: {
         id: "c1",
         type: "conclusion",
-        text: "La impresora no está conectada a Wi-Fi. Solución: Reiniciar el modo de configuración inalámbrica."
+        text: "La impresora no está conectada a Wi-Fi. Reinicie el modo de configuración inalámbrica."
       },
 
       // Pregunta 2
@@ -125,7 +189,7 @@
       c2: {
         id: "c2",
         type: "conclusion",
-        text: "La impresora está en modo de configuración Wi-Fi. Use la app HP Smart para finalizar la conexión."
+        text: "La impresora está en modo configuración. Use la app HP Smart para finalizar la conexión."
       },
 
       // Pregunta 3
@@ -141,7 +205,7 @@
       c3: {
         id: "c3",
         type: "conclusion",
-        text: "El nivel de tinta es bajo o hay un problema con el cartucho. Solución: Revisar o reemplazar el cartucho."
+        text: "El nivel de tinta es bajo o hay un problema con el cartucho. Revise o reemplace el cartucho."
       },
 
       // Pregunta 4
@@ -157,7 +221,7 @@
       c4: {
         id: "c4",
         type: "conclusion",
-        text: "Los inyectores del cartucho pueden estar obstruidos. Solución: Realizar limpieza del cabezal de impresión."
+        text: "Los inyectores pueden estar obstruidos. Realice una limpieza del cabezal de impresión."
       },
 
       // Pregunta 5
@@ -232,35 +296,51 @@
       }
     };
 
-
     /***********************************************************************
-     * 2. LÓGICA DE NAVEGACIÓN (RED DE INFERENCIA)
+     * 2. GESTIÓN DE ESTADO
      ***********************************************************************/
-
-    // Estado actual
     let currentNodeId = "start";
+
+    // Este array guardará el camino recorrido: { nodeId, type, text, answer }
+    // "answer" será la respuesta que llevó a este nodo ("yes", "no" o "start").
+    const inferencePath = [];
 
     // Referencias al DOM
     const questionContainer = document.getElementById("questionContainer");
-    const resultDiv = document.getElementById("result");
+    const diagramContainer = document.getElementById("diagramContainer");
 
-    // Función para renderizar el nodo actual (pregunta o conclusión)
-    function loadNode(nodeId) {
+    /***********************************************************************
+     * 3. FUNCIONES PARA RENDERIZAR NODOS Y DIAGRAMA
+     ***********************************************************************/
+
+    // Cargar un nodo (pregunta o conclusión) en el panel izquierdo
+    function loadNode(nodeId, answer = "start") {
       currentNodeId = nodeId;
       const node = nodes[nodeId];
 
-      // Limpiar contenedor
+      // Limpia el contenedor de la pregunta/conclusión actual
       questionContainer.innerHTML = "";
-      resultDiv.innerHTML = "";
 
+      // 1) Agregamos este nodo al camino de inferencia
+      inferencePath.push({
+        nodeId: node.id,
+        type: node.type,
+        text: node.text,
+        answer: answer
+      });
+
+      // 2) Actualizamos el diagrama a la derecha
+      updateDiagram();
+
+      // 3) Renderizamos la pregunta o la conclusión en el panel izquierdo
       if (node.type === "question") {
-        // Mostrar pregunta y opciones Sí/No
+        // Crear el elemento de pregunta
         const questionEl = document.createElement("div");
         questionEl.classList.add("question");
         questionEl.textContent = node.text;
         questionContainer.appendChild(questionEl);
 
-        // Contenedor para radio buttons
+        // Crear las opciones de respuesta
         const answersEl = document.createElement("div");
         answersEl.classList.add("answers");
         answersEl.innerHTML = `
@@ -283,8 +363,8 @@
             alert("Por favor, selecciona Sí o No.");
             return;
           }
-          const answer = selected.value; // "yes" o "no"
-          goToNextNode(node, answer);
+          const userAnswer = selected.value; // "yes" o "no"
+          goToNextNode(node, userAnswer);
         });
         questionContainer.appendChild(nextBtn);
 
@@ -297,29 +377,65 @@
       }
     }
 
-    // Función para decidir el siguiente nodo
+    // Decidir el siguiente nodo según la respuesta
     function goToNextNode(node, answer) {
-      if (answer === "yes") {
-        // Puede ser un nodo pregunta o conclusión
-        const nextId = node.yes;
-        if (nextId) {
-          loadNode(nextId);
-        } else {
-          // No hay siguiente nodo definido para "yes"
-          questionContainer.innerHTML = "<p>No se encontró el siguiente paso (YES).</p>";
-        }
+      // Obtenemos el id del siguiente nodo (según "yes" o "no")
+      const nextId = (answer === "yes") ? node.yes : node.no;
+      if (nextId) {
+        loadNode(nextId, answer);
       } else {
-        // Respuesta "no"
-        const nextId = node.no;
-        if (nextId) {
-          loadNode(nextId);
-        } else {
-          // No hay siguiente nodo definido para "no"
-          questionContainer.innerHTML = "<p>No se encontró el siguiente paso (NO).</p>";
-        }
+        // Si no hay un nodo definido, mostramos un mensaje de error (caso raro)
+        questionContainer.innerHTML = "<p>No se encontró el siguiente paso en la red de inferencia.</p>";
       }
     }
 
+    // Renderizar la “línea de razonamiento” en el panel derecho
+    function updateDiagram() {
+      diagramContainer.innerHTML = "";
+
+      inferencePath.forEach((step, index) => {
+        // Creamos un recuadro para este paso
+        const stepEl = document.createElement("div");
+        stepEl.classList.add("flow-node");
+
+        // Color según la respuesta que llevó a este nodo
+        // - "start": nodo inicial (sin color especial)
+        // - "yes": verde
+        // - "no": rojo
+        if (step.answer === "yes") {
+          stepEl.style.borderColor = "green";
+        } else if (step.answer === "no") {
+          stepEl.style.borderColor = "red";
+        }
+
+        // Título y contenido
+        if (step.type === "question") {
+          stepEl.innerHTML = `
+            <h3>Pregunta [${step.nodeId}]</h3>
+            <p>${step.text}</p>
+          `;
+        } else {
+          stepEl.innerHTML = `
+            <h3>Conclusión [${step.nodeId}]</h3>
+            <p>${step.text}</p>
+          `;
+        }
+
+        // Agregamos el nodo al diagrama
+        diagramContainer.appendChild(stepEl);
+
+        // Si no es el último nodo, dibujamos una flecha (simple)
+        if (index < inferencePath.length - 1) {
+          const arrowEl = document.createElement("div");
+          arrowEl.classList.add("flow-arrow");
+          diagramContainer.appendChild(arrowEl);
+        }
+      });
+    }
+
+    /***********************************************************************
+     * 4. INICIALIZACIÓN
+     ***********************************************************************/
     // Cargar el nodo inicial
     loadNode(currentNodeId);
   </script>
