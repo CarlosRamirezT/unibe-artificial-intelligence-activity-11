@@ -34,7 +34,7 @@
       text-align: center;
       margin-top: 0;
     }
-    /* Contenedor para cada “mensaje” en el “chat” */
+    /* Contenedor para cada “mensaje” en el chat */
     .message {
       margin-bottom: 20px;
       padding: 10px;
@@ -77,7 +77,6 @@
       border: 2px solid #ccc;
       border-radius: 4px;
       background: #fff;
-      position: relative;
     }
     .flow-node h3 {
       margin: 0 0 5px 0;
@@ -98,19 +97,19 @@
 </head>
 <body>
   <div class="main-container">
-    <!-- Panel Izquierdo: “Chat” de preguntas y conclusiones -->
+    <!-- Panel Izquierdo: Chat acumulativo -->
     <div class="left-panel">
       <h1>Diagnóstico de la Impresora</h1>
       <div id="chatContainer">
-        <!-- Se van añadiendo los mensajes (preguntas y conclusiones) acumulativamente -->
+        <!-- Se irán agregando las preguntas y conclusiones sin borrar las anteriores -->
       </div>
     </div>
 
-    <!-- Panel Derecho: Visualización de la red de inferencia (en tiempo real) -->
+    <!-- Panel Derecho: Diagrama de inferencia en tiempo real -->
     <div class="right-panel">
       <h2>Línea de Razonamiento</h2>
       <div id="diagramContainer">
-        <!-- Se muestra el camino recorrido en la red de inferencia -->
+        <!-- Se muestra el camino recorrido con indentación -->
       </div>
     </div>
   </div>
@@ -127,51 +126,48 @@
       - yes: id del siguiente nodo si la respuesta es "Sí".
       - no:  id del siguiente nodo si la respuesta es "No".
       
-      En este ejemplo se incluyen dos ramas principales:
-      1) Si la impresora enciende correctamente (camino lineal).
-      2) Si no enciende, se realizan preguntas anidadas para verificar conexiones.
+      En este ejemplo se crean ramas para ambas situaciones:
+      • Si la impresora enciende correctamente se sigue la rama "lineal".
+      • Si no enciende se inicia una serie de preguntas anidadas.
+      
+      Cada nodo que se agrega se mostrará con un nivel (depth) incrementado para reflejar la jerarquía.
     */
     const nodes = {
-      // Nodo inicial: ¿La impresora enciende correctamente?
+      // Nodo inicial
       start: {
         id: "start",
         type: "question",
         text: "¿La impresora enciende correctamente?",
-        // Si enciende (sí): seguir camino lineal.
-        yes: "q1",
-        // Si no, se ingresa al camino anidado de alimentación.
-        no: "p0"
+        yes: "q1",    // Rama lineal si enciende
+        no: "p0"      // Rama anidada si no enciende
       },
-      /* Ramo de preguntas anidadas (si no enciende) */
-      // p0: ¿Está enchufada al tomacorriente?
+
+      /* Rama anidada para cuando NO enciende */
       p0: {
         id: "p0",
         type: "question",
         text: "La impresora no enciende. ¿Está enchufada al tomacorriente?",
         yes: "p1",
-        no: "c0" // Conclusión si no está enchufada.
+        no: "c0"
       },
-      // p1: ¿Está enchufada en la parte posterior de la impresora?
       p1: {
         id: "p1",
         type: "question",
         text: "¿Está enchufada a la parte posterior de la impresora?",
         yes: "p2",
-        no: "c1" // Conclusión si no lo está.
+        no: "c1"
       },
-      // p2: ¿Al conectar todo, la luz de la impresora se enciende en amarillo?
       p2: {
         id: "p2",
         type: "question",
-        text: "Al conectar todo, ¿la luz de la impresora se enciende en amarillo?",
+        text: "Al conectar todo, ¿la luz se enciende en amarillo?",
         yes: "c2",
         no: "c3"
       },
-      // Conclusión de la rama anidada
       c0: {
         id: "c0",
         type: "conclusion",
-        text: "La impresora no está enchufada. Conecte el cable al tomacorriente y pruebe nuevamente."
+        text: "La impresora no está enchufada. Conéctela al tomacorriente y vuelva a intentarlo."
       },
       c1: {
         id: "c1",
@@ -181,15 +177,15 @@
       c2: {
         id: "c2",
         type: "conclusion",
-        text: "La impresora muestra luz amarilla pero no enciende. Podría tratarse de un fallo interno; consulte el servicio técnico."
+        text: "La luz amarilla indica un fallo interno. Consulte el servicio técnico."
       },
       c3: {
         id: "c3",
         type: "conclusion",
-        text: "Si al conectar todo no se enciende la luz, revise la fuente de poder o contacte soporte."
+        text: "Si la luz no se enciende, revise la fuente de poder o contacte soporte."
       },
-      /* Ramo lineal (si enciende correctamente) */
-      // q1: ¿La luz Wi-Fi está encendida (fija o parpadeando)?
+
+      /* Rama lineal para cuando SI enciende */
       q1: {
         id: "q1",
         type: "question",
@@ -197,7 +193,6 @@
         yes: "q2",
         no: "c4"
       },
-      // q2: ¿La luz Wi-Fi parpadea en azul?
       q2: {
         id: "q2",
         type: "question",
@@ -215,7 +210,6 @@
         type: "conclusion",
         text: "La impresora está en modo configuración Wi-Fi. Use la app HP Smart para finalizar la conexión."
       },
-      // q3: ¿El indicador luminoso de tinta está encendido?
       q3: {
         id: "q3",
         type: "question",
@@ -228,7 +222,6 @@
         type: "conclusion",
         text: "El nivel de tinta es bajo o hay un problema con el cartucho. Revise o reemplace el cartucho."
       },
-      // q4: ¿La impresión sale borrosa o con rayas?
       q4: {
         id: "q4",
         type: "question",
@@ -251,19 +244,19 @@
     /***********************************************************************
      * 2. GESTIÓN DE ESTADO
      ***********************************************************************/
-    // Variable para el nodo actual (inicia en "start")
     let currentNodeId = "start";
-    // Array para almacenar el camino recorrido: cada entrada incluye { nodeId, type, text, answer, depth }
+    // Array que almacena el camino recorrido: cada entrada incluye { nodeId, type, text, answer, depth }
     const inferencePath = [];
 
     /***********************************************************************
-     * 3. FUNCIONES PARA RENDERIZAR EL CHAT Y EL DIAGRAMA
+     * 3. FUNCIONES PARA RENDERIZAR EL CHAT Y DIAGRAMA
      ***********************************************************************/
-    // La función showNode ahora recibe un parámetro 'depth' para reflejar el nivel de anidamiento.
+    // La función showNode muestra el nodo actual en el chat y actualiza el diagrama.
+    // Se recibe además el parámetro 'depth' para reflejar el nivel de anidamiento.
     function showNode(nodeId, answer = "start", depth = 0) {
       const node = nodes[nodeId];
 
-      // Agregar el nodo al camino de inferencia, incluyendo el nivel (depth)
+      // Agregamos el nodo al camino de inferencia, incluyendo el nivel (depth)
       inferencePath.push({
         nodeId: node.id,
         type: node.type,
@@ -272,13 +265,13 @@
         depth: depth
       });
 
-      // Actualizar el diagrama en el panel derecho
+      // Actualizamos el diagrama en el panel derecho
       updateDiagram();
 
-      // Crear un contenedor para este mensaje en el chat
+      // Creamos un contenedor para este mensaje en el chat
       const messageEl = document.createElement("div");
       messageEl.classList.add("message");
-      // Agregar indentación según el nivel de anidamiento (depth)
+      // Aplicamos indentación según el nivel (depth)
       messageEl.style.marginLeft = (depth * 20) + "px";
 
       if (node.type === "question") {
@@ -297,7 +290,7 @@
         `;
         chatContainer.appendChild(messageEl);
 
-        // Asignar listener al botón para procesar la respuesta
+        // Asignamos el listener para el botón de respuesta
         const btnNext = document.getElementById(`btn-${node.id}`);
         btnNext.addEventListener("click", () => {
           const selected = document.querySelector(`input[name="answer-${node.id}"]:checked`);
@@ -306,15 +299,13 @@
             return;
           }
           const userAnswer = selected.value;
-          // Deshabilitar las opciones para evitar cambios posteriores
+          // Deshabilitar opciones para que no se modifiquen
           btnNext.disabled = true;
           const radios = messageEl.querySelectorAll(`input[name="answer-${node.id}"]`);
           radios.forEach(r => r.disabled = true);
 
-          // Calcular el nivel del siguiente nodo:
-          // Si la respuesta es "no", incrementamos el depth (anidamiento), de lo contrario, mantenemos el mismo.
-          const parentDepth = depth;
-          const nextDepth = (userAnswer === "no") ? parentDepth + 1 : parentDepth;
+          // En este ejemplo, para cualquier respuesta se incrementa el nivel de anidamiento.
+          const nextDepth = depth + 1;
           goToNextNode(node, userAnswer, nextDepth);
         });
 
@@ -326,11 +317,12 @@
         `;
         chatContainer.appendChild(messageEl);
       }
-      // Scroll automático al final del panel izquierdo (chat)
+
+      // Scroll automático para que siempre se vea la última entrada
       chatContainer.scrollTop = chatContainer.scrollHeight;
     }
 
-    // Función que decide el siguiente nodo y lo muestra, pasando también el 'depth' calculado
+    // Función que decide y muestra el siguiente nodo, pasando el 'depth' calculado
     function goToNextNode(node, answer, nextDepth) {
       const nextId = (answer === "yes") ? node.yes : node.no;
       if (nextId) {
@@ -342,16 +334,16 @@
       }
     }
 
-    // Función para actualizar el diagrama (panel derecho)
+    // Función para actualizar el diagrama en el panel derecho según el camino recorrido
     function updateDiagram() {
       diagramContainer.innerHTML = "";
       inferencePath.forEach((step, index) => {
         const stepEl = document.createElement("div");
         stepEl.classList.add("flow-node");
-        // Agregar indentación en el diagrama según el nivel (depth)
+        // Indentación según el nivel (depth)
         stepEl.style.marginLeft = (step.depth * 20) + "px";
 
-        // Color del borde según la respuesta que llevó al nodo:
+        // Colorear el borde según la respuesta
         if (step.answer === "yes") {
           stepEl.style.borderColor = "green";
         } else if (step.answer === "no") {
@@ -369,7 +361,7 @@
           `;
         }
         diagramContainer.appendChild(stepEl);
-        // Dibujar una flecha simple entre nodos (salvo el último)
+        // Dibujar una flecha simple entre cada nodo (excepto el último)
         if (index < inferencePath.length - 1) {
           const arrowEl = document.createElement("div");
           arrowEl.classList.add("flow-arrow");
