@@ -12,7 +12,7 @@
       background: #f0f0f0;
     }
     .main-container {
-      display: flex; /* Para columnas */
+      display: flex;
       min-height: 100vh;
     }
     /* Panel izquierdo: “chat” de preguntas y respuestas */
@@ -30,12 +30,10 @@
       padding: 20px;
       overflow-y: auto;
     }
-
     h1, h2 {
       text-align: center;
       margin-top: 0;
     }
-
     /* Contenedor para cada “mensaje” en el “chat” */
     .message {
       margin-bottom: 20px;
@@ -60,7 +58,6 @@
       background: #e0ffe0;
       border: 1px solid #00cc00;
     }
-
     button {
       padding: 8px 16px;
       font-size: 14px;
@@ -73,8 +70,7 @@
     button:hover {
       background: #0056b3;
     }
-
-    /* Estilos para el diagrama de inferencia (derecha) */
+    /* Estilos para el diagrama de inferencia (panel derecho) */
     .flow-node {
       padding: 10px;
       margin: 10px 0;
@@ -106,7 +102,7 @@
     <div class="left-panel">
       <h1>Diagnóstico de la Impresora</h1>
       <div id="chatContainer">
-        <!-- Aquí se irán añadiendo las preguntas y conclusiones de forma acumulativa -->
+        <!-- Se van añadiendo los mensajes (preguntas y conclusiones) acumulativamente -->
       </div>
     </div>
 
@@ -114,7 +110,7 @@
     <div class="right-panel">
       <h2>Línea de Razonamiento</h2>
       <div id="diagramContainer">
-        <!-- Se mostrará el “camino” recorrido en la red de inferencia -->
+        <!-- Se muestra el camino recorrido en la red de inferencia -->
       </div>
     </div>
   </div>
@@ -124,205 +120,168 @@
      * 1. DEFINICIÓN DE NODOS (REGLAS Y CONCLUSIONES)
      ***********************************************************************/
     /*
-      Cada nodo (objeto) tiene:
-      - id: identificador único
-      - type: "question" o "conclusion"
-      - text: texto a mostrar
-      - yes: id del siguiente nodo si la respuesta es "Sí"
-      - no:  id del siguiente nodo si la respuesta es "No"
+      Cada nodo es un objeto con:
+      - id: identificador único.
+      - type: "question" o "conclusion".
+      - text: texto a mostrar.
+      - yes: id del siguiente nodo si la respuesta es "Sí".
+      - no:  id del siguiente nodo si la respuesta es "No".
+      
+      En este ejemplo se incluyen dos ramas principales:
+      1) Si la impresora enciende correctamente (camino lineal).
+      2) Si no enciende, se realizan preguntas anidadas para verificar conexiones.
     */
-
     const nodes = {
-      // Nodo inicial
+      // Nodo inicial: ¿La impresora enciende correctamente?
       start: {
         id: "start",
         type: "question",
         text: "¿La impresora enciende correctamente?",
+        // Si enciende (sí): seguir camino lineal.
         yes: "q1",
-        no: "c0"
+        // Si no, se ingresa al camino anidado de alimentación.
+        no: "p0"
       },
-
-      // Conclusión si la impresora no enciende
+      /* Ramo de preguntas anidadas (si no enciende) */
+      // p0: ¿Está enchufada al tomacorriente?
+      p0: {
+        id: "p0",
+        type: "question",
+        text: "La impresora no enciende. ¿Está enchufada al tomacorriente?",
+        yes: "p1",
+        no: "c0" // Conclusión si no está enchufada.
+      },
+      // p1: ¿Está enchufada en la parte posterior de la impresora?
+      p1: {
+        id: "p1",
+        type: "question",
+        text: "¿Está enchufada a la parte posterior de la impresora?",
+        yes: "p2",
+        no: "c1" // Conclusión si no lo está.
+      },
+      // p2: ¿Al conectar todo, la luz de la impresora se enciende en amarillo?
+      p2: {
+        id: "p2",
+        type: "question",
+        text: "Al conectar todo, ¿la luz de la impresora se enciende en amarillo?",
+        yes: "c2",
+        no: "c3"
+      },
+      // Conclusión de la rama anidada
       c0: {
         id: "c0",
         type: "conclusion",
-        text: "Posible problema de alimentación. Verifique cable de alimentación, enchufe y botón de encendido."
+        text: "La impresora no está enchufada. Conecte el cable al tomacorriente y pruebe nuevamente."
       },
-
-      // Pregunta 1
+      c1: {
+        id: "c1",
+        type: "conclusion",
+        text: "La impresora podría no estar correctamente conectada en la parte posterior. Verifique la conexión."
+      },
+      c2: {
+        id: "c2",
+        type: "conclusion",
+        text: "La impresora muestra luz amarilla pero no enciende. Podría tratarse de un fallo interno; consulte el servicio técnico."
+      },
+      c3: {
+        id: "c3",
+        type: "conclusion",
+        text: "Si al conectar todo no se enciende la luz, revise la fuente de poder o contacte soporte."
+      },
+      /* Ramo lineal (si enciende correctamente) */
+      // q1: ¿La luz Wi-Fi está encendida (fija o parpadeando)?
       q1: {
         id: "q1",
         type: "question",
         text: "¿La luz Wi-Fi está encendida (fija o parpadeando)?",
         yes: "q2",
-        no: "c1"
+        no: "c4"
       },
-
-      // Conclusión: Luz Wi-Fi apagada
-      c1: {
-        id: "c1",
-        type: "conclusion",
-        text: "La impresora no está conectada a Wi-Fi. Reinicie el modo de configuración inalámbrica."
-      },
-
-      // Pregunta 2
+      // q2: ¿La luz Wi-Fi parpadea en azul?
       q2: {
         id: "q2",
         type: "question",
         text: "¿La luz Wi-Fi parpadea en azul?",
-        yes: "c2",
+        yes: "c5",
         no: "q3"
       },
-
-      // Conclusión: Modo configuración Wi-Fi
-      c2: {
-        id: "c2",
+      c4: {
+        id: "c4",
         type: "conclusion",
-        text: "La impresora está en modo configuración. Use la app HP Smart para finalizar la conexión."
+        text: "La impresora no está conectada a Wi-Fi. Reinicie el modo de configuración inalámbrica."
       },
-
-      // Pregunta 3
+      c5: {
+        id: "c5",
+        type: "conclusion",
+        text: "La impresora está en modo configuración Wi-Fi. Use la app HP Smart para finalizar la conexión."
+      },
+      // q3: ¿El indicador luminoso de tinta está encendido?
       q3: {
         id: "q3",
         type: "question",
         text: "¿El indicador luminoso de tinta está encendido?",
-        yes: "c3",
+        yes: "c6",
         no: "q4"
       },
-
-      // Conclusión: Problema de tinta
-      c3: {
-        id: "c3",
+      c6: {
+        id: "c6",
         type: "conclusion",
         text: "El nivel de tinta es bajo o hay un problema con el cartucho. Revise o reemplace el cartucho."
       },
-
-      // Pregunta 4
+      // q4: ¿La impresión sale borrosa o con rayas?
       q4: {
         id: "q4",
         type: "question",
         text: "¿La impresión sale borrosa o con rayas?",
-        yes: "c4",
-        no: "q5"
-      },
-
-      // Conclusión: Limpieza de cabezal
-      c4: {
-        id: "c4",
-        type: "conclusion",
-        text: "Los inyectores pueden estar obstruidos. Realice una limpieza del cabezal de impresión."
-      },
-
-      // Pregunta 5
-      q5: {
-        id: "q5",
-        type: "question",
-        text: "¿Hay un atasco de papel?",
-        yes: "c5",
-        no: "q6"
-      },
-
-      // Conclusión: Atasco de papel
-      c5: {
-        id: "c5",
-        type: "conclusion",
-        text: "Retire el papel atascado con cuidado y reinicie la impresora."
-      },
-
-      // Pregunta 6
-      q6: {
-        id: "q6",
-        type: "question",
-        text: "¿La impresora no responde a ningún comando?",
-        yes: "c6",
-        no: "q7"
-      },
-
-      // Conclusión: Reinicio general
-      c6: {
-        id: "c6",
-        type: "conclusion",
-        text: "La impresora podría necesitar un reinicio. Apáguela, espere 10 segundos y enciéndala de nuevo."
-      },
-
-      // Pregunta 7
-      q7: {
-        id: "q7",
-        type: "question",
-        text: "¿La calidad de impresión es mala (hojas en blanco o tinta irregular)?",
-        yes: "q8",
-        no: "c9"
-      },
-
-      // Pregunta 8
-      q8: {
-        id: "q8",
-        type: "question",
-        text: "¿El cartucho de color o negro está vacío?",
         yes: "c7",
         no: "c8"
       },
-
-      // Conclusión: Reemplazar cartuchos
       c7: {
         id: "c7",
         type: "conclusion",
-        text: "Reemplace el cartucho vacío o dañado y pruebe nuevamente."
+        text: "Los inyectores pueden estar obstruidos. Realice una limpieza del cabezal de impresión."
       },
-
-      // Conclusión: Revisar instalación cartuchos
       c8: {
         id: "c8",
         type: "conclusion",
         text: "Verifique que los cartuchos estén bien instalados y que el papel sea de buena calidad."
-      },
-
-      // Conclusión final si no se detectan problemas
-      c9: {
-        id: "c9",
-        type: "conclusion",
-        text: "No se detecta un problema específico según las respuestas. Consulte la guía de usuario o soporte de HP."
       }
     };
 
     /***********************************************************************
      * 2. GESTIÓN DE ESTADO
      ***********************************************************************/
+    // Variable para el nodo actual (inicia en "start")
     let currentNodeId = "start";
-    // Este array guardará el camino recorrido: { nodeId, type, text, answer }
+    // Array para almacenar el camino recorrido: cada entrada incluye { nodeId, type, text, answer, depth }
     const inferencePath = [];
 
-    // Referencias al DOM
-    const chatContainer = document.getElementById("chatContainer");
-    const diagramContainer = document.getElementById("diagramContainer");
-
     /***********************************************************************
-     * 3. FUNCIONES PARA RENDERIZAR NODOS Y DIAGRAMA
+     * 3. FUNCIONES PARA RENDERIZAR EL CHAT Y EL DIAGRAMA
      ***********************************************************************/
-
-    // Muestra un nodo (pregunta o conclusión) en el “chat” (panel izquierdo)
-    // sin eliminar las preguntas anteriores.
-    function showNode(nodeId, answer = "start") {
+    // La función showNode ahora recibe un parámetro 'depth' para reflejar el nivel de anidamiento.
+    function showNode(nodeId, answer = "start", depth = 0) {
       const node = nodes[nodeId];
 
-      // Agregamos este nodo al camino de inferencia
+      // Agregar el nodo al camino de inferencia, incluyendo el nivel (depth)
       inferencePath.push({
         nodeId: node.id,
         type: node.type,
         text: node.text,
-        answer: answer
+        answer: answer,
+        depth: depth
       });
 
-      // Actualizamos el diagrama a la derecha
+      // Actualizar el diagrama en el panel derecho
       updateDiagram();
 
-      // Creamos un contenedor para este “mensaje”
+      // Crear un contenedor para este mensaje en el chat
       const messageEl = document.createElement("div");
       messageEl.classList.add("message");
+      // Agregar indentación según el nivel de anidamiento (depth)
+      messageEl.style.marginLeft = (depth * 20) + "px";
 
-      // Diferenciamos pregunta vs conclusión
       if (node.type === "question") {
-        // Pregunta
         messageEl.innerHTML = `
           <div class="question-header">Pregunta [${node.id}]</div>
           <div class="question-text">${node.text}</div>
@@ -338,7 +297,7 @@
         `;
         chatContainer.appendChild(messageEl);
 
-        // Listener para el botón
+        // Asignar listener al botón para procesar la respuesta
         const btnNext = document.getElementById(`btn-${node.id}`);
         btnNext.addEventListener("click", () => {
           const selected = document.querySelector(`input[name="answer-${node.id}"]:checked`);
@@ -346,19 +305,20 @@
             alert("Por favor, selecciona Sí o No.");
             return;
           }
-          const userAnswer = selected.value; // "yes" o "no"
-
-          // Deshabilitar las opciones para no volver a contestar
+          const userAnswer = selected.value;
+          // Deshabilitar las opciones para evitar cambios posteriores
           btnNext.disabled = true;
           const radios = messageEl.querySelectorAll(`input[name="answer-${node.id}"]`);
           radios.forEach(r => r.disabled = true);
 
-          // Ir al siguiente nodo
-          goToNextNode(node, userAnswer);
+          // Calcular el nivel del siguiente nodo:
+          // Si la respuesta es "no", incrementamos el depth (anidamiento), de lo contrario, mantenemos el mismo.
+          const parentDepth = depth;
+          const nextDepth = (userAnswer === "no") ? parentDepth + 1 : parentDepth;
+          goToNextNode(node, userAnswer, nextDepth);
         });
 
-      } else {
-        // Conclusión
+      } else { // Caso de conclusión
         messageEl.classList.add("conclusion");
         messageEl.innerHTML = `
           <div class="question-header">Conclusión [${node.id}]</div>
@@ -366,41 +326,37 @@
         `;
         chatContainer.appendChild(messageEl);
       }
-
-      // Hacer scroll automático al final del panel
+      // Scroll automático al final del panel izquierdo (chat)
       chatContainer.scrollTop = chatContainer.scrollHeight;
     }
 
-    // Determina el siguiente nodo según la respuesta y lo muestra
-    function goToNextNode(node, answer) {
+    // Función que decide el siguiente nodo y lo muestra, pasando también el 'depth' calculado
+    function goToNextNode(node, answer, nextDepth) {
       const nextId = (answer === "yes") ? node.yes : node.no;
       if (nextId) {
-        showNode(nextId, answer);
+        showNode(nextId, answer, nextDepth);
       } else {
-        // Caso raro: no hay nodo siguiente
         const msg = document.createElement("div");
         msg.innerHTML = "<p>No se encontró el siguiente paso en la red de inferencia.</p>";
         chatContainer.appendChild(msg);
       }
     }
 
-    // Actualiza la “línea de razonamiento” (panel derecho)
+    // Función para actualizar el diagrama (panel derecho)
     function updateDiagram() {
       diagramContainer.innerHTML = "";
-
       inferencePath.forEach((step, index) => {
-        // Creamos un recuadro para este paso
         const stepEl = document.createElement("div");
         stepEl.classList.add("flow-node");
+        // Agregar indentación en el diagrama según el nivel (depth)
+        stepEl.style.marginLeft = (step.depth * 20) + "px";
 
-        // Color según la respuesta que llevó a este nodo
+        // Color del borde según la respuesta que llevó al nodo:
         if (step.answer === "yes") {
           stepEl.style.borderColor = "green";
         } else if (step.answer === "no") {
           stepEl.style.borderColor = "red";
         }
-
-        // Título y contenido
         if (step.type === "question") {
           stepEl.innerHTML = `
             <h3>Pregunta [${step.nodeId}]</h3>
@@ -412,10 +368,8 @@
             <p>${step.text}</p>
           `;
         }
-
         diagramContainer.appendChild(stepEl);
-
-        // Flecha entre nodos (salvo el último)
+        // Dibujar una flecha simple entre nodos (salvo el último)
         if (index < inferencePath.length - 1) {
           const arrowEl = document.createElement("div");
           arrowEl.classList.add("flow-arrow");
@@ -427,8 +381,12 @@
     /***********************************************************************
      * 4. INICIALIZACIÓN
      ***********************************************************************/
-    // Cargar el nodo inicial
-    showNode(currentNodeId);
+    // Referencias a los contenedores
+    const chatContainer = document.getElementById("chatContainer");
+    const diagramContainer = document.getElementById("diagramContainer");
+
+    // Iniciar el proceso mostrando el nodo inicial (depth = 0)
+    showNode(currentNodeId, "start", 0);
   </script>
 </body>
 </html>
