@@ -1,126 +1,120 @@
 /* Layout de dos columnas */
 body {
-    margin: 0;
-    padding: 0;
-    font-family: Arial, sans-serif;
-    background: #f0f0f0;
-  }
-  .main-container {
-    display: flex;
-    min-height: 100vh;
-  }
-  /* Panel izquierdo: Chat acumulativo */
-  .left-panel {
-    flex: 2;
-    background: #fff;
-    padding: 20px;
-    overflow-y: auto;
-  }
-  /* Panel derecho: Diagrama de inferencia */
-  .right-panel {
-    flex: 1;
-    background: #fafafa;
-    border-left: 1px solid #ccc;
-    padding: 20px;
-    overflow-y: auto;
-  }
-  h1, h2 {
-    text-align: center;
-    margin-top: 0;
-  }
-  /* Estilos para cada mensaje en el chat */
-  .message {
-    margin-bottom: 20px;
-    padding: 10px;
-    border-radius: 6px;
-    border: 1px solid #ddd;
-  }
-  .question-header {
-    font-weight: bold;
-    margin-bottom: 5px;
-  }
-  .question-text {
-    margin-bottom: 10px;
-  }
-  .answers {
-    margin-bottom: 10px;
-  }
-  label {
-    margin-right: 20px;
-  }
-  .conclusion {
-    background: #e0ffe0;
-    border: 1px solid #00cc00;
-  }
-  button {
-    padding: 8px 16px;
-    font-size: 14px;
-    cursor: pointer;
-    background: #007bff;
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-  }
-  button:hover {
-    background: #0056b3;
-  }
-  /* Estilos para el diagrama (panel derecho) */
-  .flow-node {
-    padding: 10px;
-    margin: 10px 0;
-    border: 2px solid #ccc;
-    border-radius: 4px;
-    background: #fff;
-  }
-  .flow-node h3 {
-    margin: 0 0 5px 0;
-    font-size: 16px;
-    font-weight: bold;
-  }
-  .flow-node p {
-    margin: 0;
-    font-size: 14px;
-  }
-  .flow-arrow {
-    width: 2px;
-    height: 20px;
-    background: #999;
-    margin: 0 auto;
-  }
-  footer {
-    background-color: #222; /* Color de fondo del footer */
-    color: #fff;            /* Color de texto */
-    padding: 20px 0;        /* Espaciado superior e inferior */
-  }
-  
-  .footer-container {
-    max-width: 1200px;      /* Ancho máximo del contenedor */
-    margin: 0 auto;         /* Centrar horizontalmente */
-    display: flex;          /* Para alinear columnas en fila */
-    flex-wrap: wrap;        /* Permitir salto si la pantalla es muy pequeña */
-    justify-content: space-between;
-  }
-  
-  .footer-column {
-    flex: 1;                /* Cada columna toma el mismo espacio disponible */
-    min-width: 200px;       /* Ancho mínimo para columnas */
-    margin: 10px;
-  }
-  
-  .footer-column img {
-    max-width: 80px;        /* Ajustar tamaño máximo del logo */
-    margin-bottom: 10px;
-  }
-  
-  .footer-column p,
-  .footer-column li {
-    font-size: 14px;        /* Tamaño de fuente */
-    margin: 5px 0;
-  }
-  
-  .footer-column ul {
-    list-style: none;       /* Quitar viñetas */
-    padding: 0;
-    margin: 0;
-  }
-  
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+  background: #f0f0f0;
+}
+.main-container {
+  display: flex;
+  min-height: 100vh;
+}
+/* Panel izquierdo: Chat acumulativo */
+.left-panel {
+  flex: 2;
+  background: #fff;
+  padding: 20px;
+  overflow-y: auto;
+}
+/* Panel derecho: Diagrama de inferencia */
+.right-panel {
+  flex: 1;
+  background: #fafafa;
+  border-left: 1px solid #ccc;
+  padding: 20px;
+  overflow-y: auto;
+}
+h1, h2 {
+  text-align: center;
+  margin-top: 0;
+}
+/* Estilos para cada mensaje en el chat */
+.message {
+  margin-bottom: 20px;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+}
+.question-header {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+.question-text {
+  margin-bottom: 10px;
+}
+.answers {
+  margin-bottom: 10px;
+}
+label {
+  margin-right: 20px;
+}
+.conclusion {
+  background: #e0ffe0;
+  border: 1px solid #00cc00;
+}
+button {
+  padding: 8px 16px;
+  font-size: 14px;
+  cursor: pointer;
+  background: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+}
+button:hover {
+  background: #0056b3;
+}
+/* Estilos para el diagrama (panel derecho) */
+.flow-node {
+  padding: 10px;
+  margin: 10px 0;
+  border: 2px solid #ccc;
+  border-radius: 4px;
+  background: #fff;
+}
+.flow-node h3 {
+  margin: 0 0 5px 0;
+  font-size: 16px;
+  font-weight: bold;
+}
+.flow-node p {
+  margin: 0;
+  font-size: 14px;
+}
+.flow-arrow {
+  width: 2px;
+  height: 20px;
+  background: #999;
+  margin: 0 auto;
+}
+footer {
+  background-color: #222;
+  color: #fff;
+  padding: 20px 0;
+}
+.footer-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+.footer-column {
+  flex: 1;
+  min-width: 200px;
+  margin: 10px;
+}
+.footer-column img {
+  max-width: 80px;
+  margin-bottom: 10px;
+}
+.footer-column p,
+.footer-column li {
+  font-size: 14px;
+  margin: 5px 0;
+}
+.footer-column ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
